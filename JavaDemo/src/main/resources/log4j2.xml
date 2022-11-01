@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<configuration status="error" monitorInterval="5">
+    <properties>
+        <property name="log.level">INFO</property>
+        <property name="log.path">log</property>
+        <property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%class{36}] [%file:%L] [%t] %M - %msg%xEx%n
+        </property>
+    </properties>
+
+    <appenders>
+        <!--控制台-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <Filters>
+                <ThresholdFilter level="${log.level}" onMatch="ACCEPT" onMisMatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${log.pattern}"/>
+        </Console>
+        <!--循环文件-->
+        <RollingRandomAccessFile  name="all" fileName="${log.path}/all.log"
+                     filePattern="${log.path}/$${date:yyyy-MM}/all-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout pattern="${log.pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="512 GB"/>
+            </Policies>
+        </RollingRandomAccessFile >
+
+        <RollingRandomAccessFile  name="warn" fileName="${log.path}/warn.log" filePattern="${log.path}/$${date:yyyy-MM}/warn-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout pattern="${log.pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+        </RollingRandomAccessFile >
+
+        <RollingRandomAccessFile  name="error" fileName="${log.path}/error.log" filePattern="${log.path}/$${date:yyyy-MM}/error-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout pattern="${log.pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+        </RollingRandomAccessFile >
+
+        <!--单个文件-->
+        <!--append="false" 每次运行程序时清空日志-->
+        <File name="test" fileName="${log.path}/test.log" append="false">
+            <Filters>
+                <ThresholdFilter level="${log.level}" onMatch="ACCEPT" onMisMatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${log.pattern}"/>
+        </File>
+    </appenders>
+
+    <loggers>
+        <root level="${log.level}" includeLocation="true">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="allAppenderAsync"/>
+            <appender-ref ref="warnAppenderAsync"/>
+            <appender-ref ref="errorAppenderAsync"/>
+        </root>
+        <logger name="testLog">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="all"/>
+            <appender-ref ref="warn"/>
+            <appender-ref ref="error"/>
+        </logger>
+    </loggers>
+</configuration>
