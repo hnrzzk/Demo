@@ -1,0 +1,102 @@
+import org.junit.Test;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class ShardingJdbcTest {
+    private DataSource getDataSourceByAPI() {
+        DataSourceGenerator generator = new DataSourceGeneratorAPI();
+        return generator.generateDataSource();
+    }
+
+    private DataSource getDataSourceByYaml() {
+        return new DataSourceGeneratorYaml().generateDataSource();
+    }
+
+
+    @Test
+    public void testConfigType() {
+        testDBActive(getDataSourceByAPI());
+//        testDBActive(getDataSourceByYaml());
+    }
+
+    private void testDBActive(DataSource dataSource) {
+
+        testInsert(dataSource);
+        testQueue(dataSource);
+    }
+
+    private void testInsert(DataSource dataSource) {
+        Thread thread = null;
+        for (int i = 0 ; i < 10; i++) {
+            final int index = i;
+            thread = new Thread(() -> doInsert(dataSource, 50000 + index * 100000, 100000));
+            thread.start();
+        }
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+//        doInsert(dataSource);
+    }
+
+    private void doInsert(DataSource dataSource, int start, int count) {
+        for (int i = start; i < (count + start); i++) {
+            long heroId = i;
+            long playerId = i;
+            String sql = "INSERT INTO inst_hero_split(`heroGuid`, `heroId`, `playerId`, `exp`, `level`, `transferLevel`, `occupation`, `expertPoints`, `treasuresMap`, `weaponGuid`, `talentPoint`, `useTalentPoint`, `talentInfo`, `godSolutionInfo`, `modifyTime`) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, '{}', 1294693940066357251, ?, ?, '{}', '{}', 1665653236579)";
+            try (
+                    Connection conn = dataSource.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, heroId);
+                ps.setLong(2, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(3, playerId);
+                ps.setLong(4, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(5, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(6, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(7, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(8, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(9, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(10, randomInt(0, Integer.MAX_VALUE/2));
+
+                System.out.println(i + ": "+ ps.executeUpdate());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static int randomInt(final int a, final int b) {
+        if (a == b) {
+            return a;
+        }
+        int min = Math.min(a, b);
+        int max = Math.max(a, b);
+        int n = max - min + 1;
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        n = random.nextInt(n);
+        n = n + min;
+        return n;
+    }
+
+    private void testQueue(DataSource dataSource) {
+        String sql = "SELECT o.* FROM inst_hero_split o WHERE o.playerId = ?";
+        try (
+                Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, 0);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    System.out.println(rs.getLong("heroGuid"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
