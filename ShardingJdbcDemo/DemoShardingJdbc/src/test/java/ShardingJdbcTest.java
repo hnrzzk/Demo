@@ -1,10 +1,11 @@
-import org.junit.Test;
+
+
+import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class ShardingJdbcTest {
     private DataSource getDataSourceByAPI() {
@@ -20,11 +21,10 @@ public class ShardingJdbcTest {
     @Test
     public void testConfigType() {
         testDBActive(getDataSourceByAPI());
-//        testDBActive(getDataSourceByYaml());
+        testDBActive(getDataSourceByYaml());
     }
 
     private void testDBActive(DataSource dataSource) {
-
         testInsert(dataSource);
         testQueue(dataSource);
     }
@@ -54,15 +54,15 @@ public class ShardingJdbcTest {
                     Connection conn = dataSource.getConnection();
                     PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setLong(1, heroId);
-                ps.setLong(2, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(2, Utils.randomInt(0, Integer.MAX_VALUE/2));
                 ps.setLong(3, playerId);
-                ps.setLong(4, randomInt(0, Integer.MAX_VALUE/2));
-                ps.setLong(5, randomInt(0, Integer.MAX_VALUE/2));
-                ps.setLong(6, randomInt(0, Integer.MAX_VALUE/2));
-                ps.setLong(7, randomInt(0, Integer.MAX_VALUE/2));
-                ps.setLong(8, randomInt(0, Integer.MAX_VALUE/2));
-                ps.setLong(9, randomInt(0, Integer.MAX_VALUE/2));
-                ps.setLong(10, randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(4, Utils.randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(5, Utils.randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(6, Utils.randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(7, Utils.randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(8, Utils.randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(9, Utils.randomInt(0, Integer.MAX_VALUE/2));
+                ps.setLong(10, Utils.randomInt(0, Integer.MAX_VALUE/2));
 
                 System.out.println(i + ": "+ ps.executeUpdate());
             } catch (Exception e) {
@@ -71,18 +71,7 @@ public class ShardingJdbcTest {
         }
     }
 
-    public static int randomInt(final int a, final int b) {
-        if (a == b) {
-            return a;
-        }
-        int min = Math.min(a, b);
-        int max = Math.max(a, b);
-        int n = max - min + 1;
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        n = random.nextInt(n);
-        n = n + min;
-        return n;
-    }
+
 
     private void testQueue(DataSource dataSource) {
         String sql = "SELECT o.* FROM inst_hero_split o WHERE o.playerId = ?";
