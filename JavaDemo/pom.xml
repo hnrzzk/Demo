@@ -8,23 +8,58 @@
     <artifactId>javaDemo</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
+
+    <profiles>
+        <profile>
+            <id>jdk-17</id>
+            <activation>
+                <jdk>17</jdk>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <maven.compiler.source>17</maven.compiler.source>
+                <maven.compiler.target>17</maven.compiler.target>
+                <maven.compiler.compilerVersion>17</maven.compiler.compilerVersion>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.1</version>
                 <configuration>
-                    <source>14</source>
-                    <target>14</target>
+                    <archive>
+                        <manifest>
+                            <mainClass>priv.hotupdate.Launch</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Premain-Class>priv.hotupdate.InstrumentHotUpdate</Premain-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                        </manifestEntries>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <outputDirectory>build</outputDirectory>
+                    <finalName>${project.artifactId}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
