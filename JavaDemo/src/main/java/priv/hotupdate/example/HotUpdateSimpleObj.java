@@ -1,4 +1,4 @@
-package priv.hotupdate;
+package priv.hotupdate.example;
 
 public class HotUpdateSimpleObj {
     boolean booleanValue;

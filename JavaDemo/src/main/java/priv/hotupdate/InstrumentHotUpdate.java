@@ -6,6 +6,7 @@ import java.lang.instrument.UnmodifiableClassException;
 import java.util.List;
 
 public final class InstrumentHotUpdate {
+
     private static Instrumentation INSTRUMENT = null;
     public static void premain(String agentArgs, Instrumentation ins) {
         System.out.println("init INSTRUMENT");

@@ -1,8 +1,12 @@
 package priv.hotupdate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import priv.hotupdate.analyzer.ClassAnalyzeResult;
 import priv.hotupdate.analyzer.IClassAnalyzer;
 import priv.hotupdate.analyzer.Jdk;
+import priv.hotupdate.example.HotUpdateEnum;
+import priv.hotupdate.example.HotUpdateSimpleObj;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -13,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Launch {
+    private static final Logger logger = LoggerFactory.getLogger(Launch.class);
     public static void main(String[] args) throws InterruptedException {
         Thread thread = new Thread(new Runnable() {
             HotUpdateSimpleObj simpleObj = new HotUpdateSimpleObj();
@@ -21,17 +26,9 @@ public class Launch {
                 int count = 0;
                 while (true) {
                     if (count == 3) {
-                        String classPath = "F:\\HotUpdateSimpleObj.class";
-                        System.out.println("load file from " + classPath);
-                        reloadClass(classPath);
+                        reloadClass("F:\\HotUpdateSimpleObj.class", "F:\\HotUpdateEnum.class");
                     }
-                    System.out.println("####################");
-                    System.out.print("old obj:");
-                    simpleObj.print();
-
-                    System.out.print("new obj:");
-                    HotUpdateSimpleObj newObj = new HotUpdateSimpleObj();
-                    newObj.print();
+                    execute();
                     count++;
                     try {
                         Thread.sleep(5000);
@@ -40,9 +37,27 @@ public class Launch {
                     }
                 }
             }
+
+            void execute() {
+                System.out.println("####################");
+                System.out.print("old obj:");
+                simpleObj.print();
+                System.out.print("new obj:");
+                HotUpdateSimpleObj newObj = new HotUpdateSimpleObj();
+                newObj.print();
+
+                System.out.println("enum size:" + HotUpdateEnum.values().length);
+            }
         });
         thread.start();
         thread.join();
+    }
+
+    public static void reloadClass(String ... classPath) {
+        for (String classPathItem : classPath) {
+            logger.info("load file from " + classPathItem);
+            reloadClass(classPathItem);
+        }
     }
 
     public static void reloadClass(String classPath) {
@@ -84,7 +99,7 @@ public class Launch {
             byte[] bs = toByteArray(file);
             return new ClassDefinition(clasz, bs);
         } catch (Exception e) {
-            System.out.println("load class failed!");
+            logger.error("load class failed!", e);
             return null;
         }
     }
@@ -106,7 +121,7 @@ public class Launch {
             input.read(buffer);
             return buffer;
         } catch (Exception e) {
-            System.out.println("read file failed!");
+            logger.error("read file failed!", e);
         } finally {
             try {
                 if (input != null) {
