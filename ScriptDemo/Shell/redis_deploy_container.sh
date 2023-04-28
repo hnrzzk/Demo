@@ -5,6 +5,7 @@ fi
 
 NAME=$1
 PORT=6379
+password=root
 if [[ $2 =~ ^[0-9]+$ && $2 -gt 0 ]]; then
   PORT=$2
 else
@@ -22,5 +23,5 @@ docker run --restart=always -d \
  -v ${ROOT_PATH}/myredis.conf:/etc/redis/redis.conf \
  -v ${ROOT_PATH}/data:/data \
  redis \
- redis-server /etc/redis/redis.conf  --appendonly yes  --requirepass root
+ redis-server /etc/redis/redis.conf  --appendonly yes  --requirepass ${password}
 
