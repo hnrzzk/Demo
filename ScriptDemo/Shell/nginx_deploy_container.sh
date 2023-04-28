@@ -33,14 +33,14 @@ mkdir -p ${root_path}/conf/nginx.conf
 
 docker cp ${nginx_temp_name}:/etc/nginx/nginx.conf ${root_path}/conf/nginx.conf
 docker cp ${nginx_temp_name}:/etc/nginx/conf.d ${root_path}/conf.d
-docker cp ${nginx_temp_name}:/usr/share/nginx/html ${root_path}/nginx
+docker cp ${nginx_temp_name}:/usr/share/nginx/html ${root_path}/html
 
 docker stop ${nginx_temp_name} 
 docker rm ${nginx_temp_name}
 
 docker create --net=host --name ${container_name} --restart=always \
--v ${root_path}/conf/nginx.conf:/etc/nginx/nginx.conf \
--v ${root_path}/conf.d:/etc/nginx/conf.d \
--v ${root_path}/html:/usr/share/nginx/html \
--v ${root_path}/logs:/var/log/nginx \
+-v ${root_path}/conf/nginx.conf/:/etc/nginx/nginx.conf/ \
+-v ${root_path}/conf.d/:/etc/nginx/conf.d/ \
+-v ${root_path}/html/:/usr/share/nginx/html/ \
+-v ${root_path}/logs/:/var/log/nginx/ \
 -d  nginx
