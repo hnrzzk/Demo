@@ -38,7 +38,7 @@ docker cp ${nginx_temp_name}:/usr/share/nginx/html ${root_path}/nginx
 docker stop ${nginx_temp_name} 
 docker rm ${nginx_temp_name}
 
-docker run --net=host --name ${container_name} --restart=always \
+docker create --net=host --name ${container_name} --restart=always \
 -v ${root_path}/conf/nginx.conf:/etc/nginx/nginx.conf \
 -v ${root_path}/conf.d:/etc/nginx/conf.d \
 -v ${root_path}/html:/usr/share/nginx/html \
