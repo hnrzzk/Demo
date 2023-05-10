@@ -28,9 +28,9 @@ public class SharedMemoryWriter {
                 buffer.position(0);
 
                 // Write the buffer to the shared memory
-                long start = System.currentTimeMillis();
+                long start = System.nanoTime();
                 int bytesWritten = channel.write(buffer);
-                long end = System.currentTimeMillis();
+                long end = System.nanoTime();
                 System.out.printf("Bytes written: %s Value: %s cost:%d %n", bytesWritten, num, (end - start));
                 // Increment the count and sleep for 1-2 seconds
                 count++;
