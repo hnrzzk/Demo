@@ -19,9 +19,8 @@ cd $shell_path
 container_name=$2
 root_path=/data/nginx/${container_name}
 
-docker pull nginx
-
 if [ "$1" == "init" ]; then
+  docker pull nginx
   nginx_temp_name=nginx_temp
   docker run -d --name ${nginx_temp_name} nginx
 
