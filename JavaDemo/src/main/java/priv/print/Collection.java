@@ -19,10 +19,10 @@ public class Collection {
      * @return
      */
     public static String arrayToString(int[] array) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (int item : array) {
-            result += item + " ";
+            result.append(item).append(" ");
         }
-        return result;
+        return result.toString();
     }
 }
