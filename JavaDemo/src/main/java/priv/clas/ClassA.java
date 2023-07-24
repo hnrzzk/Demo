@@ -1,6 +1,6 @@
 package priv.clas;
 
-abstract class ClassA {
+abstract class ClassA implements InterfaceA<ClassA>{
     protected void methodA() {
         System.out.println("ClassA methodA");
         methodB();
